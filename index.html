@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шифратор</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Nunito:wght@400;700&family=Quicksand:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Nunito', Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(45deg, #000000, #1a0033);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        .login-container, .cipher-container {
+            background-color: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(170, 0, 255, 0.6);
+            width: 350px;
+            max-width: 90%;
+            animation: fadeIn 0.7s ease-in-out, glowing 3s infinite alternate;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before, .cipher-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(138, 43, 226, 0.3), transparent 30%);
+            animation: rotate 10s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .cipher-container {
+            display: none;
+            width: 500px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-50px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes glowing {
+            0% { box-shadow: 0 0 25px rgba(170, 0, 255, 0.5); }
+            100% { box-shadow: 0 0 40px rgba(255, 0, 255, 0.8); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-1deg); }
+            20%, 40%, 60%, 80% { transform: translateX(10px) rotate(1deg); }
+        }
+
+        .shake {
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        h2 {
+            text-align: center;
+            color: #e100ff;
+            margin-bottom: 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(225, 0, 255, 0.5);
+            animation: pulseText 2s infinite alternate;
+        }
+
+        @keyframes pulseText {
+            0% { text-shadow: 0 0 5px rgba(225, 0, 255, 0.5); }
+            100% { text-shadow: 0 0 15px rgba(225, 0, 255, 0.9), 0 0 30px rgba(225, 0, 255, 0.4); }
+        }
+
+        input[type="password"], 
+        textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 12px 0;
+            border: 2px solid #5c5c8a;
+            background-color: rgba(18, 18, 37, 0.8);
+            color: #fff;
+            border-radius: 12px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 8px rgba(138, 43, 226, 0.2);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+        }
+
+        input[type="password"]:focus,
+        textarea:focus {
+            border-color: #e100ff;
+            box-shadow: inset 0 0 10px rgba(138, 43, 226, 0.4), 0 0 20px rgba(225, 0, 255, 0.3);
+            outline: none;
+            transform: scale(1.01);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(135deg, #8a2be2, #ff1493);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s;
+            z-index: -1;
+        }
+
+        button:hover::before {
+            left: 100%;
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        button:hover {
+            opacity: 0.95;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.4);
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .button-row button {
+            flex: 1;
+            opacity: 0.7;
+            transform: scale(0.98);
+        }
+
+        .active-btn {
+            background: linear-gradient(135deg, #ff1493, #8a2be2);
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.6);
+            animation: pulse 2s infinite;
+            opacity: 1 !important;
+            transform: scale(1.02) !important;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(255, 20, 147, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(255, 20, 147, 0.8); }
+            100% { box-shadow: 0 0 15px rgba(255, 20, 147, 0.6); }
+        }
+
+        .copy-btn {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            padding: 12px 25px;
+            border-radius: 8px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-family: 'Quicksand', sans-serif;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+        }
+
+        .show-message {
+            opacity: 1;
+            animation: fadeInOut 2s forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 20px); }
+            20% { opacity: 1; transform: translate(-50%, 0); }
+            80% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: linear-gradient(135deg, #8a2be2, #ff1493);
+            border-radius: 50%;
+            animation: float 15s linear infinite;
+            opacity: 0.5;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="success-message" id="successMessage">Скопійовано!</div>
+    
+    <div class="login-container" id="loginContainer">
+        <h2>Авторизація</h2>
+        <input type="password" id="passwordField" placeholder="Введіть пароль" />
+        <button id="loginButton">Увійти</button>
+        <div id="passwordStatus" style="margin-top: 15px; color: #ff5555; text-align: center; font-family: 'Quicksand', sans-serif;"></div>
+    </div>
+
+    <div class="cipher-container" id="cipherContainer">
+        <h2>Шифратор</h2>
+        <textarea id="inputText" placeholder="Текст для шифрування/розшифрування"></textarea>
+        <textarea id="keyText" placeholder="Ключ"></textarea>
+        <textarea id="outputText" placeholder="Результат" readonly></textarea>
+        <button id="copyButton" class="copy-btn">Копіювати результат</button>
+        <div class="button-row">
+            <button id="encryptButton" class="active-btn">Шифрувати</button>
+            <button id="decryptButton">Розшифрувати</button>
+        </div>
+    </div>
+
+    <script>
+        const standardChars = {};
+        const specialChars = {};
+        
+        let charCode = 1;
+        for (let i = 0; i < 'абвгґдеєжзиіїйклмнопрстуфхцчшщьюя'.length; i++) {
+            standardChars['абвгґдеєжзиіїйклмнопрстуфхцчшщьюя'[i]] = charCode++;
+        }
+        for (let i = 0; i < 'АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ'.length; i++) {
+            standardChars['АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ'[i]] = charCode++;
+        }
+        for (let i = 0; i < 'abcdefghijklmnopqrstuvwxyz'.length; i++) {
+            standardChars['abcdefghijklmnopqrstuvwxyz'[i]] = charCode++;
+        }
+        for (let i = 0; i < 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.length; i++) {
+            standardChars['ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i]] = charCode++;
+        }
+        for (let i = 0; i < '0123456789'.length; i++) {
+            standardChars['0123456789'[i]] = charCode++;
+        }
+        for (let i = 0; i < ' !@#$%^&*()_+-=[]{}|;:\'",.<>/?\\~`'.length; i++) {
+            standardChars[' !@#$%^&*()_+-=[]{}|;:\'",.<>/?\\~`'[i]] = charCode++;
+        }
+        
+        const specialSymbols = "サニﾐりちペｨポォｼᑑᓵしﾁョッレｬナろｲﾘﾑ･ュビﾌﾂヌﾛﾞヴꖎゐゖｦᒲヘぷギシみぽﾏフヺｻテカへパｩᒷわゅらぴﾀ‖ゑツァャヵワヮユコかネげぶべリねトぇ!ﾋﾝゲざ∴びガすどｪﾆイまゃゥくゆタ⍊ほグはｵ⚍プ↸ザズぢダキゼロﾜﾅ┫ぎヂベゞﾍぬﾙマ⎓バセだムいえ￤ヤおそﾊケᓭのぺぐꖌｱばメソゾ⋮ﾖﾒぅクやうせハめもピゴぃｰ∷きヸむヷﾚじʖヨｷｯアｶﾟﾃラがっゎずヅょひﾈとごぜヶボﾉﾇｿiつｴミホゝﾗあぉンにノけづェたゕ〒ヹｺこヲｽルブぱｾｮモドﾔｫｭデよぼオエでｹぁウヰﾎんﾄｳヱてｸヒﾓｧスﾕるゔᔑジさふチれぞ∧ィ勹をな";
+        
+        for (let i = 0; i < specialSymbols.length; i++) {
+            specialChars[i + 1] = specialSymbols[i];
+        }
+        
+        const reverseStandardChars = {};
+        for (let char in standardChars) {
+            reverseStandardChars[standardChars[char]] = char;
+        }
+        
+        const reverseSpecialChars = {};
+        for (let num in specialChars) {
+            reverseSpecialChars[specialChars[num]] = parseInt(num);
+        }
+        
+        function encrypt(text, key) {
+            let result = '';
+            let keyIndex = 0;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (standardChars[char] === undefined) {
+                    result += char;
+                    continue;
+                }
+                
+                let charValue = standardChars[char];
+                
+                while (keyIndex < key.length && standardChars[key[keyIndex]] === undefined) {
+                    keyIndex = (keyIndex + 1) % key.length;
+                }
+                
+                if (keyIndex >= key.length) keyIndex = 0;
+                const keyChar = key[keyIndex];
+                const keyValue = standardChars[keyChar] || 1;
+                keyIndex = (keyIndex + 1) % key.length;
+                
+                let resultValue = charValue + keyValue;
+                
+                while (resultValue > specialSymbols.length) {
+                    resultValue -= specialSymbols.length;
+                }
+                
+                result += specialChars[resultValue];
+            }
+            
+            return result;
+        }
+        
+        function decrypt(text, key) {
+            let result = '';
+            let keyIndex = 0;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (reverseSpecialChars[char] === undefined) {
+                    result += char;
+                    continue;
+                }
+                
+                let charValue = reverseSpecialChars[char];
+                
+                while (keyIndex < key.length && standardChars[key[keyIndex]] === undefined) {
+                    keyIndex = (keyIndex + 1) % key.length;
+                }
+                
+                if (keyIndex >= key.length) keyIndex = 0;
+                const keyChar = key[keyIndex];
+                const keyValue = standardChars[keyChar] || 1;
+                keyIndex = (keyIndex + 1) % key.length;
+                
+                let resultValue = charValue - keyValue;
+                
+                while (resultValue < 1) {
+                    resultValue += specialSymbols.length;
+                }
+                
+                result += reverseStandardChars[resultValue] || '';
+            }
+            
+            return result;
+        }
+        
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const numberOfParticles = 80;
+            
+            for (let i = 0; i < numberOfParticles; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 6 + 2;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.bottom = `${posY}%`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            const loginContainer = document.getElementById('loginContainer');
+            const cipherContainer = document.getElementById('cipherContainer');
+            const passwordField = document.getElementById('passwordField');
+            const loginButton = document.getElementById('loginButton');
+            const passwordStatus = document.getElementById('passwordStatus');
+            const inputText = document.getElementById('inputText');
+            const keyText = document.getElementById('keyText');
+            const outputText = document.getElementById('outputText');
+            const encryptButton = document.getElementById('encryptButton');
+            const decryptButton = document.getElementById('decryptButton');
+            const copyButton = document.getElementById('copyButton');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Захищений пароль (зашифрований)
+            const encodedPasswordSource = "aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0Rhbnlsb0tvYi9wYXNzd29yZC1zdG9yYWdlL21haW4vcGFzc3dvcmQudHh0";
+            
+            async function getCorrectPassword() {
+                try {
+                    const source = atob(encodedPasswordSource);
+                    const response = await fetch(source);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const correctPassword = await response.text();
+                    return correctPassword.trim();
+                } catch (error) {
+                    passwordStatus.textContent = "Помилка з'єднання з сервером.";
+                    passwordStatus.style.color = "#ff5555";
+                    return null;
+                }
+            }
+            
+            getCorrectPassword().then(correctPassword => {
+                if (!correctPassword) return;
+                
+                function tryLogin() {
+                    const enteredPassword = passwordField.value.trim();
+                    
+                    if (enteredPassword === correctPassword) {
+                        passwordStatus.textContent = "Пароль вірний! Входимо...";
+                        passwordStatus.style.color = "#00ff00";
+                        
+                        loginContainer.style.animation = "fadeIn 0.5s reverse forwards";
+                        
+                        setTimeout(() => {
+                            loginContainer.style.display = 'none';
+                            cipherContainer.style.display = 'block';
+                            cipherContainer.style.animation = "fadeIn 0.7s forwards";
+                        }, 500);
+                    } else {
+                        passwordStatus.textContent = "Невірний пароль. Спробуйте ще раз.";
+                        passwordStatus.style.color = "#ff5555";
+                        
+                        loginContainer.classList.add('shake');
+                        setTimeout(() => {
+                            loginContainer.classList.remove('shake');
+                        }, 600);
+                    }
+                }
+                
+                loginButton.addEventListener('click', tryLogin);
+                
+                passwordField.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        tryLogin();
+                    }
+                });
+            });
+            
+            let encryptionMode = true;
+            
+            encryptButton.addEventListener('click', function() {
+                encryptionMode = true;
+                encryptButton.classList.add('active-btn');
+                decryptButton.classList.remove('active-btn');
+                processText();
+            });
+            
+            decryptButton.addEventListener('click', function() {
+                encryptionMode = false;
+                decryptButton.classList.add('active-btn');
+                encryptButton.classList.remove('active-btn');
+                processText();
+            });
+            
+            inputText.addEventListener('input', processText);
+            keyText.addEventListener('input', processText);
+            
+            function processText() {
+                const text = inputText.value;
+                const key = keyText.value;
+                
+                if (text && key) {
+                    if (encryptionMode) {
+                        outputText.value = encrypt(text, key);
+                    } else {
+                        outputText.value = decrypt(text, key);
+                    }
+                } else {
+                    outputText.value = '';
+                }
+            }
+            
+            copyButton.addEventListener('click', function() {
+                if (outputText.value) {
+                    outputText.select();
+                    document.execCommand('copy');
+                    
+                    successMessage.classList.add('show-message');
+                    setTimeout(() => {
+                        successMessage.classList.remove('show-message');
+                    }, 2000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
